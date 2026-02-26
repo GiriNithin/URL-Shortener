@@ -56,11 +56,10 @@ URL-Shortener/
 
 ### 1. Database (PostgreSQL)
 
-Create a DB and run the schema:
+Run the schema against your database (default `postgres`):
 
 ```bash
-createdb urlshortener
-psql -d urlshortener -f backend/schema.sql
+psql -d postgres -f backend/schema.sql
 ```
 
 ### 2. Backend (EC2-style)
@@ -102,7 +101,7 @@ npm run build
 ### RDS (PostgreSQL)
 
 1. Create a PostgreSQL instance (e.g. db.t3.micro).
-2. Create a database (e.g. `urlshortener`).
+2. Create a database (or use the default `postgres`).
 3. Run `backend/schema.sql` on it (e.g. via psql or RDS query editor).
 4. Note endpoint, port, user, password for the backend `.env`.
 

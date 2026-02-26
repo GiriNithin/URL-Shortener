@@ -1,5 +1,5 @@
 -- Run this script on your Amazon RDS PostgreSQL instance to create the schema.
--- Example: psql -h your-rds-endpoint -U postgres -d urlshortener -f schema.sql
+-- Example: psql -h your-rds-endpoint -U postgres -d postgres -f schema.sql
 
 CREATE TABLE IF NOT EXISTS urls (
   id         BIGSERIAL PRIMARY KEY,

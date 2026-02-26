@@ -3,7 +3,7 @@ import { Pool } from 'pg';
 const pool = new Pool({
   host: process.env.RDS_HOST || 'localhost',
   port: parseInt(process.env.RDS_PORT || '5432', 10),
-  database: process.env.RDS_DATABASE || 'urlshortener',
+  database: process.env.RDS_DATABASE || 'postgres',
   user: process.env.RDS_USER || 'postgres',
   password: process.env.RDS_PASSWORD || 'postgres',
   max: 10,
