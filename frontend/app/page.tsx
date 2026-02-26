@@ -32,19 +32,22 @@ export default function Home() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/shorten`, {
+      const url = `${API_URL}/api/shorten`;
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: longUrl.trim() }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error || 'Failed to shorten URL');
+        setError((data && data.error) || 'Failed to shorten URL');
         return;
       }
       setShortUrl(data.shortUrl);
     } catch (err) {
-      setError('Could not reach the server. Is the backend running?');
+      setError(
+        `Could not reach the backend at ${API_URL}. Check that it is running, the URL is correct, and CORS/security groups allow requests from this site.`
+      );
     } finally {
       setLoading(false);
     }

@@ -98,6 +98,20 @@ npm run build
 
 ## Deploy on AWS
 
+### Before running `npm run build`
+
+**Backend (EC2):**
+- Node.js 18+ installed.
+- Run `npm install` in the `backend/` directory first (so TypeScript and devDependencies are available for the build).
+- No need for a database connection at build time; `.env` is only required when you run the app (`npm start`).
+
+**Frontend (S3):**
+- Node.js 18+ installed.
+- Run `npm install` in the `frontend/` directory first.
+- Set `NEXT_PUBLIC_API_URL` when building (e.g. your backend/short-domain URL), or it will default to `http://localhost:3001`.
+
+---
+
 ### RDS (PostgreSQL)
 
 1. Create a PostgreSQL instance (e.g. db.t3.micro).
@@ -111,9 +125,10 @@ npm run build
 2. Install Node.js, clone the repo, then:
    ```bash
    cd backend
-   npm ci
+   npm install
    npm run build
    ```
+   **Note:** Use `npm install` (not `npm install --production`) so TypeScript is in `node_modules` for the build. You should see `Build complete: dist/ ready` after a successful build.
 3. Set environment variables (e.g. in `.env` or systemd/PM2):
    - `PORT=3001`
    - `BASE_URL=https://short.yourdomain.com` (or your EC2/ALB URL)
@@ -124,16 +139,22 @@ npm run build
 
 ### S3 + CloudFront (Frontend)
 
-1. Build static export:
+1. Build the static export (this creates the `frontend/out/` folder; it is not in the repo):
    ```bash
    cd frontend
    NEXT_PUBLIC_API_URL=https://short.yourdomain.com npm run build
    ```
 2. Create an S3 bucket, enable static website hosting (or use CloudFront origin).
-3. Upload the contents of `frontend/out/` to the bucket (e.g. `aws s3 sync out/ s3://your-bucket/ --delete`).
-4. Optionally create a CloudFront distribution with the S3 bucket as origin, and use that URL (or a custom domain) as `FRONTEND_URL` and for users.
-
-After this, the frontend (on S3) will call your EC2 backend for shortening, and visiting `https://short.yourdomain.com/<code>` will redirect via EC2 and RDS to the original URL.
+3. Upload the built files from `out/` to the bucket (run from the `frontend` directory after the build):
+   ```bash
+   aws s3 sync out/ s3://your-bucket/ --delete
+   ```
+4. **After uploading**, do the following:
+   - **Enable static website hosting** on the bucket (if not already): S3 → bucket → Properties → Static website hosting → Enable, set index document to `index.html`, error document to `404.html` (or `index.html` if your app handles 404s).
+   - **Get your frontend URL**: either the S3 website endpoint (`http://your-bucket.s3-website-<region>.amazonaws.com`) or your CloudFront URL/domain.
+   - **Set `FRONTEND_URL` on the backend** (EC2 `.env` or process env) to this URL so that `GET /` on the backend redirects users to the app.
+   - **(Optional)** Create a **CloudFront** distribution with the S3 bucket as origin for HTTPS and custom domain; then use that URL as `FRONTEND_URL` and for sharing the app.
+5. **(Optional)** For clean URLs (e.g. `/some-path` instead of `/some-path.html`), configure CloudFront or S3 to serve `index.html` for 404s, or use CloudFront error pages to redirect 403/404 to `/index.html` with 200 (for client-side routing).
 
 ## Base62 encoding (short codes)
 

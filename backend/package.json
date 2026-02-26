@@ -4,12 +4,13 @@
   "description": "URL shortener API and redirect service for EC2",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && echo 'Build complete: dist/ ready'",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn src/index.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "pg": "^8.12.0"
   },
