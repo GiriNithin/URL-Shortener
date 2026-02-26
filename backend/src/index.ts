@@ -5,7 +5,7 @@ import { shortenRouter } from './routes/shorten.js';
 import { redirectRouter } from './routes/redirect.js';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = parseInt(process.env.PORT || '3001', 10);
 
 app.use(cors({ origin: true }));
 app.use(express.json());
